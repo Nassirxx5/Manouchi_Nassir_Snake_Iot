@@ -1,0 +1,204 @@
+/*body {
+    background-color: #1a1a2e; 
+    color: #fff;
+    font-family: 'Press Start 2P', monospace; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.game-container {
+    text-align: center;
+    background: #16213e;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0, 255, 204, 0.2);
+}
+
+canvas {
+    background-color: #0f3460;
+    border: 4px solid #e94560;
+    border-radius: 5px;
+    box-shadow: 0 0 15px #e94560; 
+    margin: 20px 0;
+}
+
+button {
+    background-color: #00d2ff;
+    border: none;
+    padding: 10px 15px;
+    font-family: inherit;
+    font-size: 0.8rem;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: transform 0.2s;
+}
+
+button:hover {
+    transform: scale(1.05);
+}*/
+/* ==========================================
+   1. POLICES ET RÉINITIALISATION GLOBALE
+   ========================================== */
+/* Importation d'une police "Gaming" depuis Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+/* Réinitialisation de base pour tout centrer et utiliser toute la page */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-radius;
+    font-family: 'Press Start 2P', monospace; /* Police gaming */
+}
+
+body {
+    background: radial-gradient(circle, #1a1a2e 0%, #16213e 100%); /* Fond dégradé circulaire pour la profondeur */
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden; /* Empêche les barres de défilement */
+}
+
+/* ==========================================
+   2. LE CONTENEUR PRINCIPAL DU JEU
+   ========================================== */
+.game-container {
+    text-align: center;
+    background: #0f3460;
+    padding: 30px;
+    border-radius: 20px;
+    border: 3px solid #e94560; /* Bordure néon rouge */
+    box-shadow: 0 0 25px rgba(233, 69, 96, 0.4); /* Effet néon global */
+    width: 90%;
+    max-width: 480px; /* Taille maximale pour rester élégant */
+}
+
+/* ==========================================
+   3. L'ENTÊTE (TITRE ET SCORES)
+   ========================================== */
+header h1 {
+    font-size: 1.5rem;
+    color: #00ffcc; /* Vert cyan néon */
+    text-shadow: 0 0 10px #00ffcc, 0 0 20px #00ffcc; /* Double glow */
+    margin-bottom: 20px;
+    text-transform: uppercase;
+}
+
+.scores {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    font-size: 0.8rem;
+}
+
+.scores p {
+    color: #fff;
+}
+
+/* Couleurs différentes pour distinguer les scores */
+#current-score {
+    color: #00d2ff; /* Bleu néon */
+    text-shadow: 0 0 8px #00d2ff;
+}
+
+#high-score {
+    color: #ffde00; /* Jaune néon */
+    text-shadow: 0 0 8px #ffde00;
+}
+
+/* ==========================================
+   4. LE CANVAS DU JEU
+   ========================================== */
+canvas {
+    background-color: #1a1a2e; /* Fond sombre pour le contraste */
+    border-radius: 10px;
+    box-shadow: 
+        inset 0 0 20px rgba(0, 0, 0, 0.8), /* Ombre interne pour la profondeur */
+        0 0 20px #e94560; /* Effet de glow externe rouge néon */
+    margin: 20px 0;
+    display: block; /* Élimine l'espace blanc sous le canvas */
+}
+
+/*
+
+*/
+
+/* ==========================================
+   5. LES ÉLÉMENTS DU JEU (CSS n'applique pas ici, 
+      ces styles sont pour t'inspirer pour le JS)
+   ========================================== */
+/* Dans script.js, tu peux utiliser ces styles pour ton Snake et ta Food */
+
+/* Le Snake :
+   - Couleur : '#00ffcc' (Tête), '#00b3b3' (Corps)
+   - Coins arrondis (`border-radius`) sur les segments pour un look moderne.
+   - Un léger dégradé interne ou un glow.
+   
+La Food :
+   - Couleur : '#e94560' (Rouge)
+   - Animation : Pulsation pour la faire "briller".
+*/
+
+/*
+
+*/
+
+/* ==========================================
+   6. LES CONTRÔLES MATÉRIELS (BOUTON & STATUT)
+   ========================================== */
+.hardware-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+}
+
+button {
+    background-color: #00d2ff;
+    color: #1a1a2e;
+    border: none;
+    padding: 12px 24px;
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 8px;
+    box-shadow: 0 4px #00a8cc; /* Ombre 3D */
+    transition: transform 0.1s, box-shadow 0.1s; /* Transition pour le clic */
+    outline: none; /* Retire la bordure par défaut */
+}
+
+button:hover {
+    background-color: #00e6ff;
+    box-shadow: 0 4px #00ccff;
+}
+
+button:active {
+    transform: translateY(3px); /* Effet d'enfoncement */
+    box-shadow: 0 1px #00a8cc;
+}
+
+#status {
+    margin-top: 15px;
+    font-size: 0.7rem;
+    color: #aaa;
+    font-style: italic;
+}
+
+/* ==========================================
+   7. GAME OVER OVERLAY
+   ========================================== */
+/* Style pour un fondu Game Over */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Ce style n'est appliqué qu'en cas de Game Over par le JS */
+#gameCanvas.game-over {
+    animation: fadeIn 0.5s ease;
+}
