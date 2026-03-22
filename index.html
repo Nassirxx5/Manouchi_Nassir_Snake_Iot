@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake IoT Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <header>
+            <h1>Snake IoT</h1>
+            <div class="scores">
+                <p>Score: <span id="current-score">0</span></p>
+                <p>High Score: <span id="high-score">0</span></p>
+            </div>
+        </header>
+
+        <canvas id="gameCanvas" width="400" height="400"></canvas>
+
+        <div class="hardware-controls">
+            <button id="connectBtn">🔌 Connecter Arduino</button>
+            <p id="status">Statut : Clavier uniquement</p>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
