@@ -18,7 +18,12 @@ const snakeSpeed = 8; // Vitesse du jeu (cases par seconde)
 
 // Afficher le high score au démarrage
 document.getElementById('high-score').innerText = highScore;
+const eatSound = new Audio('sounds/eat.mp3');
+const gameOverSound = new Audio('sounds/gameover.mp3');
 
+// Optionnel : régler le volume (entre 0 et 1)
+eatSound.volume = 0.5; // Moitié du volume
+gameOverSound.volume = 0.7; // Un peu plus fort pour le mème
 // 2. INITIALISATION DU JEU
 function initGame() {
     // Placer le serpent au centre
@@ -110,6 +115,7 @@ function update() {
 }
 
 function handleGameOver() {
+        gameOverSound.play();
     // Sauvegarder le high score
     if (score > highScore) {
         highScore = score;
@@ -127,8 +133,30 @@ function handleGameOver() {
     ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2);
     ctx.font = "10px 'Press Start 2P', monospace";
     ctx.fillText("Appuyez sur ESPACE pour rejouer", canvas.width / 2, canvas.height / 2 + 30);
-}
 
+}
+function update() {
+    // ... calcul de la nouvelle tête ...
+    // ... vérification des collisions murs et corps ...
+    
+    // ... ajouter la nouvelle tête ...
+
+    // 4.3 Vérifier si le serpent mange la pomme
+    if (newHead.x === food.x && newHead.y === food.y) {
+        score += 10;
+        document.getElementById('current-score').innerText = score;
+
+        // --- AJOUT ICI pour jouer "faa" ---
+        // Petite astuce pour pouvoir rejouer le son direct si on mange vite
+        eatSound.currentTime = 0; 
+        eatSound.play();
+        // ---------------------------------
+
+        placeFood();
+    } else {
+        snake.pop();
+    }
+}
 // 5. AFFICHAGE (Rendu sur le Canvas)
 function draw() {
     // Effacer l'écran

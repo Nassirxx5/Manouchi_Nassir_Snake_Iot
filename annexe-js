@@ -1,0 +1,59 @@
+let serialPort;
+let isConnected = false;
+
+// Fonction pour parser le texte qui arrive de l'Arduino
+class LineBreakTransformer {
+  constructor() { this.chunks = ""; }
+  transform(chunk, controller) {
+    this.chunks += chunk;
+    const lines = this.chunks.split("\r\n");
+    this.chunks = lines.pop();
+    lines.forEach((line) => controller.enqueue(line));
+  }
+  flush(controller) { controller.enqueue(this.chunks); }
+}
+
+async function connectSerial() {
+  try {
+    // Demande à l'utilisateur de choisir le port COM de l'Arduino Nano
+    serialPort = await navigator.serial.requestPort();
+    await serialPort.open({ baudRate: 9600 });
+    
+    isConnected = true;
+    document.getElementById('status').innerText = "Statut : Manette Connectée 🎮";
+    
+    const textDecoder = new TextDecoderStream();
+    const readableStreamClosed = serialPort.readable.pipeTo(textDecoder.writable);
+    const reader = textDecoder.readable
+      .pipeThrough(new TransformStream(new LineBreakTransformer()))
+      .getReader();
+
+    // Boucle d'écoute infinie (tourne en arrière-plan)
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) {
+        reader.releaseLock();
+        break;
+      }
+      if (value) {
+        handleJoystickCommand(value.trim());
+      }
+    }
+  } catch (error) {
+    console.error("Erreur de connexion série :", error);
+    document.getElementById('status').innerText = "Statut : Erreur de connexion";
+  }
+}
+
+// Fonction qui fait le pont entre l'Arduino et ton Snake
+function handleJoystickCommand(command) {
+  // Remplace "direction" par le nom de la variable qui gère la direction de ton serpent
+  // Empêche le serpent de faire demi-tour (ex: s'il va à gauche, il ne peut pas aller à droite direct)
+  if (command === 'U' && direction !== 'DOWN') direction = 'UP';
+  if (command === 'D' && direction !== 'UP') direction = 'DOWN';
+  if (command === 'L' && direction !== 'RIGHT') direction = 'LEFT';
+  if (command === 'R' && direction !== 'LEFT') direction = 'RIGHT';
+}
+
+// Lier le bouton à la fonction
+document.getElementById('connectBtn').addEventListener('click', connectSerial);
