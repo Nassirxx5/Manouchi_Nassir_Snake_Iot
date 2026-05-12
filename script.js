@@ -1,4 +1,6 @@
+// ==========================================
 // 1. CONFIGURATION ET VARIABLES GLOBALES
+// ==========================================
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const gridSize = 20; // Le canvas fait 400x400, donc 20x20 cases
@@ -18,13 +20,18 @@ const snakeSpeed = 8; // Vitesse du jeu (cases par seconde)
 
 // Afficher le high score au démarrage
 document.getElementById('high-score').innerText = highScore;
+
+// --- GESTION DE L'AUDIO ---
 const eatSound = new Audio('sounds/eat.mp3');
 const gameOverSound = new Audio('sounds/gameover.mp3');
 
 // Optionnel : régler le volume (entre 0 et 1)
 eatSound.volume = 0.5; // Moitié du volume
 gameOverSound.volume = 0.7; // Un peu plus fort pour le mème
+
+// ==========================================
 // 2. INITIALISATION DU JEU
+// ==========================================
 function initGame() {
     // Placer le serpent au centre
     snake = [
@@ -59,7 +66,9 @@ function placeFood() {
     }
 }
 
+// ==========================================
 // 3. LA BOUCLE DE JEU (GAME LOOP)
+// ==========================================
 function mainLoop(currentTime) {
     if (gameOver) {
         handleGameOver();
@@ -81,7 +90,9 @@ function mainLoop(currentTime) {
     draw();   // Dessiner le résultat
 }
 
+// ==========================================
 // 4. LOGIQUE DU JEU (Mouvements & Collisions)
+// ==========================================
 function update() {
     // Calculer la position de la nouvelle tête
     const newHead = { x: snake[0].x + dx, y: snake[0].y + dy };
@@ -107,6 +118,11 @@ function update() {
     if (newHead.x === food.x && newHead.y === food.y) {
         score += 10;
         document.getElementById('current-score').innerText = score;
+
+        // Jouer le son "faa"
+        eatSound.currentTime = 0; 
+        eatSound.play();
+
         placeFood(); // Nouvelle pomme, on ne retire pas la queue (donc il grandit)
     } else {
         // S'il ne mange pas, on retire le dernier segment (il avance)
@@ -115,7 +131,9 @@ function update() {
 }
 
 function handleGameOver() {
-        gameOverSound.play();
+    // Jouer le rire du chat
+    gameOverSound.play();
+
     // Sauvegarder le high score
     if (score > highScore) {
         highScore = score;
@@ -133,31 +151,11 @@ function handleGameOver() {
     ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2);
     ctx.font = "10px 'Press Start 2P', monospace";
     ctx.fillText("Appuyez sur ESPACE pour rejouer", canvas.width / 2, canvas.height / 2 + 30);
-
 }
-function update() {
-    // ... calcul de la nouvelle tête ...
-    // ... vérification des collisions murs et corps ...
-    
-    // ... ajouter la nouvelle tête ...
 
-    // 4.3 Vérifier si le serpent mange la pomme
-    if (newHead.x === food.x && newHead.y === food.y) {
-        score += 10;
-        document.getElementById('current-score').innerText = score;
-
-        // --- AJOUT ICI pour jouer "faa" ---
-        // Petite astuce pour pouvoir rejouer le son direct si on mange vite
-        eatSound.currentTime = 0; 
-        eatSound.play();
-        // ---------------------------------
-
-        placeFood();
-    } else {
-        snake.pop();
-    }
-}
+// ==========================================
 // 5. AFFICHAGE (Rendu sur le Canvas)
+// ==========================================
 function draw() {
     // Effacer l'écran
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -174,7 +172,9 @@ function draw() {
     });
 }
 
+// ==========================================
 // 6. CONTRÔLES (Clavier)
+// ==========================================
 window.addEventListener('keydown', e => {
     // Empêcher de faire demi-tour (si dx === 1, on ne peut pas faire dx = -1)
     if (e.key === 'ArrowUp' && dy !== 1) { dx = 0; dy = -1; }
@@ -188,7 +188,9 @@ window.addEventListener('keydown', e => {
     }
 });
 
+// ==========================================
 // 7. CONTRÔLES MATÉRIELS (Web Serial API - Arduino)
+// ==========================================
 let serialPort;
 
 class LineBreakTransformer {
