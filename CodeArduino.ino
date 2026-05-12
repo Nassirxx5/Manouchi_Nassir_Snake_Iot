@@ -1,48 +1,56 @@
-// Définition des broches
+// Pins pour le Joystick
 const int pinX = A0;
 const int pinY = A1;
 
-// Variable pour mémoriser la dernière commande envoyée
-// Cela évite d'inonder le navigateur de messages si on maintient le joystick
-char lastCommand = ' ';
+// Pins pour la LED RGB
+const int pinR = 9;
+const int pinG = 10;
+const int pinB = 11;
 
 void setup() {
-  // Initialisation de la communication série à 9600 bauds (doit correspondre au JavaScript)
   Serial.begin(9600);
+  
+  pinMode(pinR, OUTPUT);
+  pinMode(pinG, OUTPUT);
+  pinMode(pinB, OUTPUT);
+  
+  // LED éteinte au départ
+  setRGB(0, 0, 0); 
 }
 
 void loop() {
-  // Lecture des valeurs analogiques (entre 0 et 1023)
-  // Au repos, le joystick renvoie environ 512.
-  int xValue = analogRead(pinX);
-  int yValue = analogRead(pinY);
-  
-  char currentCommand = ' ';
+  // --- 1. ENVOI : Lecture du Joystick ---
+  int xVal = analogRead(pinX);
+  int yVal = analogRead(pinY);
 
-  // Définition d'une "zone morte" (deadzone) entre 400 et 600 
-  // pour éviter que le serpent ne bouge tout seul si le joystick n'est pas parfaitement centré
-  if (xValue < 400) {
-    currentCommand = 'L'; // Gauche
-  } else if (xValue > 600) {
-    currentCommand = 'R'; // Droite
-  } else if (yValue < 400) {
-    currentCommand = 'U'; // Haut (Attention: l'axe Y peut être inversé selon l'orientation physique de ton joystick)
-  } else if (yValue > 600) {
-    currentCommand = 'D'; // Bas
+  if (yVal < 300) Serial.println("U");
+  else if (yVal > 700) Serial.println("D");
+  else if (xVal < 300) Serial.println("L");
+  else if (xVal > 700) Serial.println("R");
+
+  // --- 2. RÉCEPTION : Lecture des ordres du PC ---
+  if (Serial.available() > 0) {
+    char cmd = Serial.read();
+    
+    if (cmd == 'S') {        // START : Bleu
+      setRGB(0, 0, 255);
+    } 
+    else if (cmd == 'E') {   // EAT : Flash Vert rapide
+      setRGB(0, 255, 0);
+      delay(100); 
+      setRGB(0, 0, 255);     // Repasse au bleu
+    } 
+    else if (cmd == 'G') {   // GAME OVER : Rouge
+      setRGB(255, 0, 0);
+    }
   }
 
-  // Si on détecte une direction ET qu'elle est différente de la dernière envoyée
-  if (currentCommand != ' ' && currentCommand != lastCommand) {
-    Serial.println(currentCommand); // Envoie la lettre suivie d'un retour à la ligne
-    lastCommand = currentCommand;
-  }
-  
-  // Si le joystick revient au centre, on réinitialise la dernière commande
-  // Cela permet de repousser le joystick dans la même direction ensuite
-  if (currentCommand == ' ') {
-    lastCommand = ' ';
-  }
+  delay(50); // Petite pause pour la stabilité
+}
 
-  // Petite pause pour stabiliser la lecture
-  delay(50);
+// Fonction pour changer la couleur facilement
+void setRGB(int r, int g, int b) {
+  analogWrite(pinR, r);
+  analogWrite(pinG, g);
+  analogWrite(pinB, b);
 }

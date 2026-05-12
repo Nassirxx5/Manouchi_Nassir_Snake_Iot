@@ -13,6 +13,7 @@ let dy = 0; // Direction verticale (1 = bas, -1 = haut)
 let score = 0;
 let highScore = localStorage.getItem('snakeHighScore') || 0;
 let gameOver = false;
+let serialWriter;//envoyer donnée a l'Arduino
 
 // Gestion du temps pour requestAnimationFrame
 let lastRenderTime = 0;
@@ -118,6 +119,7 @@ function update() {
     if (newHead.x === food.x && newHead.y === food.y) {
         score += 10;
         document.getElementById('current-score').innerText = score;
+        if (serialWriter) serialWriter.write("E\r\n");
 
         // Jouer le son "faa"
         eatSound.currentTime = 0; 
@@ -140,7 +142,7 @@ function handleGameOver() {
         localStorage.setItem('snakeHighScore', highScore);
         document.getElementById('high-score').innerText = highScore;
     }
-
+    if (serialWriter) serialWriter.write("G\r\n");
     // Effet visuel simple
     ctx.fillStyle = "rgba(0, 0, 0, 0.75)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -228,6 +230,12 @@ async function connectSerial() {
         const reader = textDecoder.readable
             .pipeThrough(new TransformStream(new LineBreakTransformer()))
             .getReader();
+        const textEncoder = new TextEncoderStream();
+        const writableStreamClosed = textEncoder.readable.pipeTo(serialPort.writable);
+        serialWriter = textEncoder.writable.getWriter();
+
+        // Envoyer 'S' pour dire que le jeu commence (LED Bleue)
+        await serialWriter.write("S\r\n");
 
         while (true) {
             const { value, done } = await reader.read();
